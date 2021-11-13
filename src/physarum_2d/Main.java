@@ -5,17 +5,16 @@
  */
 package physarum_2d;
 
+import physarum_2d.view.gui.AppWindow;
+
 /**
  *
  * @author Alexis Cassion
  */
-public class PHYSARUM_2D {
-
-    /**
-     * @param args the command line arguments
-     */
+public class Main {
+    
     public static void main(String[] args) {
-        // TODO code application logic here
+        AppWindow gui = new AppWindow();
     }
     
 }
