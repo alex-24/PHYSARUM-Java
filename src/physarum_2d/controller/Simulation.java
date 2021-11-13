@@ -16,7 +16,7 @@ import physarum_2d.model.Species;
 import physarum_2d.model.Vector;
 import physarum_2d.view.SimuUpdateEventListener;
 import physarum_2d.view.SimuUpdateEventSender;
-import physarum_2d.view.UI_CONSTANTS;
+import physarum_2d.view.Constants;
 
 /**
  *
@@ -45,30 +45,32 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
     private Color[][] trailMap;
     Boolean[] isSpeciesActive;
     private int[] trailsDecayValues;
+    private int nbOfSpecies;
 
     public Simulation(int width, int height, int populationPercentage, Boolean[] isSpeciesActive, Color[] speciesColor, int[] trailsDecayValues, int diffusionKernel, float wProj) {
         this.width = width;
         this.height = height;
         this.populationPercentage = populationPercentage;
         this.isSpeciesActive = isSpeciesActive;
+        this.trailsDecayValues = trailsDecayValues;
         this.diffusionKernel = diffusionKernel;
         this.wProj = wProj;
         
         this.trailMap = new Color[this.width][this.height];
         
-        for (int i = 0; i < this.height; i++) {
-            for (int j = 0; j < this.width; j++) {
-                this.trailMap[i][j] = new Color(0, 0, 0, 0);
+        for (int i = 0; i < this.width; i++) {
+            for (int j = 0; j < this.height; j++) {
+                this.trailMap[i][j] = new Color(0, 0, 0);
             }
         }
         
         int totalPopulation = (int) ((this.width * this.height) * (this.populationPercentage / 100.0));
         
-        int nbOfSpecies = (int) Arrays.stream(this.isSpeciesActive, 0, 4).filter(t -> t).count();
-        int speciesPopulation = totalPopulation / nbOfSpecies;
+        this.nbOfSpecies = (int) Arrays.stream(this.isSpeciesActive, 0, this.isSpeciesActive.length).filter(t -> t).count();
+        int speciesPopulation = totalPopulation / this.nbOfSpecies;
         
         System.out.println("Population of : " + totalPopulation);
-        System.out.println(nbOfSpecies + " species");
+        System.out.println(this.nbOfSpecies + " species");
         System.out.println(speciesPopulation + " per species");
         
         for (int i = 0; i < this.isSpeciesActive.length; i++) {
@@ -77,14 +79,12 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
             }
         }
         
-        prepareThreadsAndRunnables();
+        prepareRunnables();
         
     }
 
     @Override
     public void run() {
-        
-        //notifySimuUpdateEventListeners();
         
         while (true) {
             try {
@@ -93,7 +93,8 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                 // System.out.println("--" + this.species.get(0).getAgents().get(0).getPosition());
                 
                 // TRAIL DECAY -------------------------------------------------
-                //decayTrailsNonConcurrent();
+                System.out.println("DECAY STAGE");
+                decayTrailsNonConcurrent();
                 
                 // MOTOR STAGE -------------------------------------------------
                 System.out.println("MOTOR STAGE");
@@ -102,7 +103,7 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                 for (int i=0; i<this.species.size(); i++) {
                     for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
                         this.agentThreads.add(new Thread(this.agentMotorRunnables.get(agentIdx)));
-                        this.agentThreads.get(agentIdx).run();
+                        this.agentThreads.get(agentIdx).start();
                         agentIdx++;
                     }
                 }
@@ -117,7 +118,7 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                 for (int i=0; i<this.species.size(); i++) {
                     for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
                         this.agentThreads.add(new Thread(this.agentSensoryRunnables.get(agentIdx)));
-                        this.agentThreads.get(agentIdx).run();
+                        this.agentThreads.get(agentIdx).start();
                         agentIdx++;
                     }
                 }
@@ -127,7 +128,7 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                 
                 // DELAY NEXT SIMULATION STEP FOR GUI
                 notifySimuUpdateEventListeners();
-                Thread.sleep(UI_CONSTANTS.SIMULATION_UPDATE_DELAY_IN_MILLIS);
+                Thread.sleep(Constants.SIMULATION_UPDATE_DELAY_IN_MILLIS);
                 
             } catch (InterruptedException ex) {
                 Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
@@ -136,7 +137,7 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
         }
     }
     
-    private void prepareThreadsAndRunnables() {
+    private void prepareRunnables() {
         for (Species species : this.species) {
             for (Agent agent : species.getAgents()) {
                 this.agentMotorRunnables.add(new Runnable() {
@@ -145,16 +146,13 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                         
                         switch(species) {
                             case 0://R
-                                return trailMapCell.getGreen() != 0 && trailMapCell.getBlue() != 0 && trailMapCell.getAlpha() != 0;
+                                return trailMapCell.getGreen() != 0 && trailMapCell.getBlue() != 0;
                             
                             case 1://G
-                                return trailMapCell.getRed() != 0 && trailMapCell.getBlue() != 0 && trailMapCell.getAlpha() != 0;
+                                return trailMapCell.getRed() != 0 && trailMapCell.getBlue() != 0;
                             
                             case 2://B
-                                return trailMapCell.getRed() != 0 && trailMapCell.getGreen() != 0 && trailMapCell.getAlpha() != 0;
-                            
-                            case 3://A
-                                return trailMapCell.getRed() != 0 && trailMapCell.getGreen() != 0 && trailMapCell.getBlue() != 0;
+                                return trailMapCell.getRed() != 0 && trailMapCell.getGreen() != 0;
                                 
                             default:
                                 return false;
@@ -163,9 +161,8 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                     @Override
                     public void run() {
                         
-                        
                         Vector newPos = agent.getPosition().clone();
-                        newPos.sub(agent.getDirection()).scale(agent.getStepSize());
+                        newPos.add(agent.getDirection().clone().scale(agent.getStepSize()));
                         
                         boolean wouldHitAWall = (newPos.getX() < 0 || newPos.getY() < 0 || newPos.getX() >= Simulation.this.width || newPos.getY() >= Simulation.this.height);
                         boolean wouldMeetOtherSpecies = (wouldHitAWall)? false : wasOtherSpeciesPresent(agent.getSpecies(), trailMap[(int) newPos.getX()][(int) newPos.getY()]);
@@ -174,7 +171,6 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                             agent.getDirection().rotate(Math.random() * Math.PI * 2).toUnitVec();
                         } else {
                             agent.setPosition(newPos);
-                           
                             depositPheromonesAtCurrentLocation(agent);
                         }
                         
@@ -194,9 +190,6 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                             
                             case 2://B
                                 return trailMapCell.getBlue();
-                            
-                            case 3://A
-                                return trailMapCell.getAlpha();
                                 
                             default:
                                 return 0;
@@ -207,9 +200,9 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                     public void run() {
                         Vector agentPosCopy = agent.getPosition().clone();
                         Vector agentDir = agent.getPosition();
-                        Vector agentSensorF = agentPosCopy.sub(agentDir.clone()).scale(agent.getSensorOffset());
-                        Vector agentSensorFL = agentPosCopy.sub(agentDir.clone().rotate(- agent.getSensorAngle())).scale(agent.getSensorOffset());
-                        Vector agentSensorFR = agentPosCopy.sub(agentDir.clone().rotate(agent.getSensorAngle())).scale(agent.getSensorOffset());
+                        Vector agentSensorF = agentPosCopy.add(agentDir.clone().scale(agent.getSensorOffset()));
+                        Vector agentSensorFL = agentPosCopy.add(agentDir.clone().rotate(- agent.getSensorAngle()).scale(agent.getSensorOffset()));
+                        Vector agentSensorFR = agentPosCopy.add(agentDir.clone().rotate(agent.getSensorAngle()).scale(agent.getSensorOffset()));
                         
                         int Fx = Math.max(0, Math.min(Simulation.this.width - 1, (int) agentSensorF.getX()));
                         int Fy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorF.getY()));
@@ -220,7 +213,7 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
                         
                         int F = getTrailQuantity(agent.getSpecies(), trailMap[Fx][Fy]);
                         int FL = getTrailQuantity(agent.getSpecies(), trailMap[FLx][FLy]);
-                        int FR = getTrailQuantity(agent.getSpecies(), trailMap[FRx][Fy]);
+                        int FR = getTrailQuantity(agent.getSpecies(), trailMap[FRx][FRy]);
                         
                         if (F > FL && F > FR) {
                             // do nothing
@@ -262,26 +255,29 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
     private synchronized void depositPheromonesAtCurrentLocation(Agent agent) {
         int x = (int) agent.getPosition().getX();
         int y = (int) agent.getPosition().getY();
-        
         Color color = this.trailMap[x][y];
+        
+        
+        //System.out.print(this.trailMap[x][y].getRed() + " --> ");
         
         switch (agent.getSpecies()) {
             case 0://R
-                int redPlusDep = Math.min(255, color.getRed() + agent.getDepositionT()); 
-                this.trailMap[x][y] = new Color(redPlusDep, color.getGreen(), color.getBlue(), color.getAlpha());
+                int redPlusDep = Math.min(255, color.getRed() + agent.getDepositionT());
+                this.trailMap[x][y] = new Color(redPlusDep, color.getGreen(), color.getBlue());
+                return;
 
             case 1://G
                 int greenPlusDep = Math.min(255, color.getGreen() + agent.getDepositionT()); 
-                this.trailMap[x][y] = new Color(color.getRed(), greenPlusDep, color.getBlue(), color.getAlpha());
+                this.trailMap[x][y] = new Color(color.getRed(), greenPlusDep, color.getBlue());
+                return;
 
             case 2://B
                 int bluePlusDep = Math.min(255, color.getBlue() + agent.getDepositionT()); 
-                this.trailMap[x][y] = new Color(color.getRed(), color.getGreen(), bluePlusDep, color.getAlpha());
-
-            case 3://A
-                int alphaPlusDep = Math.min(255, color.getAlpha() + agent.getDepositionT()); 
-                this.trailMap[x][y] = new Color(color.getRed(), color.getGreen(), color.getBlue(), alphaPlusDep);            
+                this.trailMap[x][y] = new Color(color.getRed(), color.getGreen(), bluePlusDep);
+                return;        
         }
+        
+        //System.out.println(this.trailMap[x][y].getRed());
     }
 
     public int getWidth() {
@@ -366,17 +362,20 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
         
         Color currentColor;
         
-        for (int i = 0; i < this.height; i++) {
-            for (int j = 0; j < this.width; j++) {
+        for (int i = 0; i < this.width; i++) {
+            for (int j = 0; j < this.height; j++) {
                 currentColor = this.trailMap[i][j];
                 this.trailMap[i][j] = new Color(
-                        currentColor.getRed() - this.trailsDecayValues[0],
-                        currentColor.getGreen() - this.trailsDecayValues[1],
-                        currentColor.getBlue() - this.trailsDecayValues[2],
-                        currentColor.getAlpha() - this.trailsDecayValues[3]
+                        sanitizeValue(currentColor.getRed() - this.trailsDecayValues[0], 0, 255),
+                        sanitizeValue(currentColor.getGreen() - this.trailsDecayValues[1], 0, 255),
+                        sanitizeValue(currentColor.getBlue() - this.trailsDecayValues[2], 0, 255)
                 );
             }
         }
+    }
+    
+    private int sanitizeValue(int value, int min, int max) {
+        return Math.max(Math.min(value, max), 0);
     }
 
     public Boolean[] getIsSpeciesActive() {
@@ -385,6 +384,11 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
 
     public void setIsSpeciesActive(Boolean[] isSpeciesActive) {
         this.isSpeciesActive = isSpeciesActive;
+        this.nbOfSpecies = (int) Arrays.stream(this.isSpeciesActive, 0, this.isSpeciesActive.length).filter(t -> t).count();
+    }
+
+    public int getNbOfSpecies() {
+        return this.nbOfSpecies;
     }
     
 }
