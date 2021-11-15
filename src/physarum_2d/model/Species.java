@@ -27,15 +27,22 @@ public class Species {
         this.agents = new ArrayList<>();
         this.decayT = decayT;
         
+        Vector position = Vector.randomVector(0, simulation.getWidth(), 0, simulation.getHeight());
+        //Vector direction;
+        Vector direction;
+        
         for (int i = 0; i < populationSize; i++) {
+            position = Vector.randomVector(0, simulation.getWidth(), 0, simulation.getHeight());
+            direction = position.clone().orientTowardsCoord(new Vector(simulation.getWidth() / 2, simulation.getHeight() / 2)).toUnitVect(); // face screen center
+            //direction = Vector.randomUnitVect();
             this.agents.add(new Agent(
                 speciesIdD,
-                Vector.randomVector(0, simulation.getWidth(), 0, simulation.getHeight()),
-                Vector.randomUnitVect(),
+                position,
+                direction, 
                 (Math.PI / 8) / Math.PI,
-                90,
+                Constants.SIMU_SENSOR_OFFSET,
                 (Math.PI / 8) / Math.PI,
-                1,
+                Constants.SIMU_SENSOR_RANGE,
                 Constants.SIMU_STEP_SIZE,
                 Constants.SIMU_DEP_T,
                 0f 

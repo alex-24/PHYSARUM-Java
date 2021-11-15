@@ -58,7 +58,7 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
         System.out.println("PAINTING GRAPHIC");
         
         this.trailMapObserver.print(g);
-        //this.agentObservers.forEach((agentObserver) -> agentObserver.print(g));
+        this.agentObservers.forEach((agentObserver) -> agentObserver.print(g));
     }
     
     

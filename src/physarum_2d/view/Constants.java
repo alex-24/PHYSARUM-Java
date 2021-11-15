@@ -23,8 +23,10 @@ public class Constants {
     public static final int SIMU_HEIGHT = 500;
     public static final int SIMU_POPULATION_PERCENTAGE = 1;
     public static final int SIMU_DEP_T = 255;
-    public static final int SIMU_DIFFUSION_RANGE = 2;
-    public static final int SIMU_DECAY_PERCENTAGE_T = 0;
-    public static final int SIMU_STEP_SIZE = 1;
+    public static final int SIMU_DIFFUSION_RANGE = 1;
+    public static final int SIMU_DECAY_PERCENTAGE_T = 90;
+    public static final int SIMU_STEP_SIZE = 2;
+    public static final int SIMU_SENSOR_OFFSET = 9;
+    public static final int SIMU_SENSOR_RANGE = 1;
     
 }

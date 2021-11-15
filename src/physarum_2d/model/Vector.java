@@ -35,6 +35,12 @@ public class Vector {
     public static Vector randomUnitVect() {
         return new Vector(1, 1).rotate(Math.random() * Math.PI).toUnitVect();
     }
+    
+    
+    public Vector orientTowardsCoord(Vector v) {
+        return this.sub(v).scale(-1);
+    }
+        
 
     public Vector add(Vector v){
         this.x += v.x;

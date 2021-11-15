@@ -29,7 +29,7 @@ public class AppWindow extends JFrame {
         setSize(new Dimension(Constants.SIMU_WIDTH, Constants.SIMU_HEIGHT));
         setVisible(true);
         
-        Boolean[] isSpeciesActive = new Boolean[] {true, true, true};
+        Boolean[] isSpeciesActive = new Boolean[] {true, false, false};
         Color[] speciesColors = new Color[] {Color.RED, Color.GREEN, Color.BLUE};
         int[] speciesDecayPercentage = new int[] {Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T};
         
@@ -40,7 +40,7 @@ public class AppWindow extends JFrame {
                 isSpeciesActive,
                 speciesColors,
                 speciesDecayPercentage,
-                0,
+                Constants.SIMU_DIFFUSION_RANGE,
                 0
         );
         

@@ -43,7 +43,7 @@ public class AgentObserver implements GUIObserver {
         int y = (int) this.agent.getPosition().getY() - aSizeHalf;
         
         g.setColor(this.color.darker().darker());
-        //g.fillOval(x, y, aSize, aSize);
+        g.fillOval(x, y, aSize, aSize);
         
         
         Vector agentPos = agent.getPosition();
