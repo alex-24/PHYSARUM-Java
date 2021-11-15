@@ -33,7 +33,7 @@ public class Vector {
     }
     
     public static Vector randomUnitVect() {
-        return new Vector(1, 1).rotate(Math.random() * Math.PI).toUnitVec();
+        return new Vector(1, 1).rotate(Math.random() * Math.PI).toUnitVect();
     }
 
     public Vector add(Vector v){
@@ -75,8 +75,8 @@ public class Vector {
     public Vector rotate(double angle){
         double tmpX = this.x;
 
-        this.x = this.x*Math.cos(angle) - this.y*Math.sin(angle);
-        this.y = tmpX*Math.sin(angle) + this.y*Math.cos(angle);
+        this.x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
+        this.y = tmpX * Math.sin(angle) + this.y * Math.cos(angle);
         return this;	
     }
 
@@ -88,7 +88,7 @@ public class Vector {
         return new Vector(this.x, this.y);
     }
 
-    public Vector toUnitVec(){
+    public Vector toUnitVect(){
         double n = norm();
         this.x = this.x / n;
         this.y = this.y / n;

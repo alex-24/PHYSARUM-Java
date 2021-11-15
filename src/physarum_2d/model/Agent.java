@@ -75,6 +75,10 @@ public class Agent {
         return sensorOffset;
     }
 
+    public void setSensorOffset(double sensorOffset) {
+        this.sensorOffset = sensorOffset;
+    }
+
     public double getRotationAngle() {
         return rotationAngle;
     }

@@ -12,6 +12,7 @@ import java.awt.HeadlessException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import physarum_2d.controller.Simulation;
+import physarum_2d.view.Constants;
 
 /**
  *
@@ -25,16 +26,20 @@ public class AppWindow extends JFrame {
     public AppWindow() {
         
         super("PHYSARUM - A 2D SIMULATION");
-        setSize(500, 500);
+        setSize(new Dimension(Constants.SIMU_WIDTH, Constants.SIMU_HEIGHT));
         setVisible(true);
         
+        Boolean[] isSpeciesActive = new Boolean[] {true, true, true};
+        Color[] speciesColors = new Color[] {Color.RED, Color.GREEN, Color.BLUE};
+        int[] speciesDecayPercentage = new int[] {Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T};
+        
         Simulation simulation = new Simulation(
-                200,
-                200,
-                1,
-                new Boolean[] {true, false, false, true},
-                new Color[] {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW},
-                new int[] {3, 3, 3, 3},
+                Constants.SIMU_WIDTH,
+                Constants.SIMU_HEIGHT,
+                Constants.SIMU_POPULATION_PERCENTAGE,
+                isSpeciesActive,
+                speciesColors,
+                speciesDecayPercentage,
                 0,
                 0
         );
@@ -42,8 +47,7 @@ public class AppWindow extends JFrame {
         Thread simulationThread = new Thread(simulation);
 
         simulationPanel = new SimulationPanel(simulation);
-        simulationPanel.setSize(new Dimension(200, 200));
-        simulationPanel.setLayout(new BorderLayout(0, 0));
+        setLayout(new BorderLayout(0, 0));
 
         optionsPanel = new JPanel();
         optionsPanel.setPreferredSize(new Dimension(150, 200));
@@ -55,8 +59,9 @@ public class AppWindow extends JFrame {
         // color debugging
         simulationPanel.setBackground(Color.WHITE);
         //optionsPanel.setBackground(Color.RED);
-        setContentPane(simulationPanel);
-        
+        setBackground(Color.BLACK);
+        //setContentPane(simulationPanel);
+        add(simulationPanel);
         //pack();
         //setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

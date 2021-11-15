@@ -35,12 +35,6 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
     
     
     private List<Species> species = new ArrayList<>();
-    private final List<Runnable> agentMotorRunnables = new ArrayList<>();
-    private final List<Runnable> agentSensoryRunnables = new ArrayList<>();
-    private final List<Thread> agentThreads = new ArrayList<>();
-
-    private final List<Runnable> trailDecayerRunnables = new ArrayList();
-    private final List<Thread> trailDecayerThreads = new ArrayList();
     
     private Color[][] trailMap;
     Boolean[] isSpeciesActive;
@@ -79,8 +73,6 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
             }
         }
         
-        prepareRunnables();
-        
     }
 
     @Override
@@ -88,43 +80,35 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
         
         while (true) {
             try {
-                int agentIdx;
                 
                 // System.out.println("--" + this.species.get(0).getAgents().get(0).getPosition());
-                
-                // TRAIL DECAY -------------------------------------------------
-                System.out.println("DECAY STAGE");
-                decayTrailsNonConcurrent();
-                
-                // MOTOR STAGE -------------------------------------------------
-                System.out.println("MOTOR STAGE");
-                this.agentThreads.clear();
-                agentIdx = 0;
-                for (int i=0; i<this.species.size(); i++) {
-                    for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
-                        this.agentThreads.add(new Thread(this.agentMotorRunnables.get(agentIdx)));
-                        this.agentThreads.get(agentIdx).start();
-                        agentIdx++;
-                    }
-                }
-                for (Thread agentThread : this.agentThreads) {
-                        agentThread.join();
-                }
+                //System.out.println("--" + this.species.get(0).getAgents().get(0).getDirection());
                 
                 System.out.println("SENSORY STAGE");
                 // SENSORY STAGE -----------------------------------------------
-                this.agentThreads.clear();
-                agentIdx = 0;
                 for (int i=0; i<this.species.size(); i++) {
                     for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
-                        this.agentThreads.add(new Thread(this.agentSensoryRunnables.get(agentIdx)));
-                        this.agentThreads.get(agentIdx).start();
-                        agentIdx++;
+                        executeSensoryStage(this.species.get(i).getAgents().get(j));
                     }
                 }
-                for (Thread agentThread : this.agentThreads) {
-                        agentThread.join();
+                
+                // MOTOR STAGE -------------------------------------------------
+                System.out.println("MOTOR & DEPOSIT STAGE");
+                for (int i=0; i<this.species.size(); i++) {
+                    for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
+                        executeMotorStage(this.species.get(i).getAgents().get(j));
+                    }
                 }
+                
+                
+                // TRAIL DIFFUSION -------------------------------------------------
+                System.out.println("DIFFUSION STAGE");
+                diffuseTrails();
+                
+                
+                // TRAIL DECAY -------------------------------------------------
+                System.out.println("DECAY STAGE");
+                decayTrails();
                 
                 // DELAY NEXT SIMULATION STEP FOR GUI
                 notifySimuUpdateEventListeners();
@@ -137,128 +121,98 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
         }
     }
     
-    private void prepareRunnables() {
-        for (Species species : this.species) {
-            for (Agent agent : species.getAgents()) {
-                this.agentMotorRunnables.add(new Runnable() {
-                    
-                    private boolean wasOtherSpeciesPresent(int species, Color trailMapCell) {
-                        
-                        switch(species) {
-                            case 0://R
-                                return trailMapCell.getGreen() != 0 && trailMapCell.getBlue() != 0;
-                            
-                            case 1://G
-                                return trailMapCell.getRed() != 0 && trailMapCell.getBlue() != 0;
-                            
-                            case 2://B
-                                return trailMapCell.getRed() != 0 && trailMapCell.getGreen() != 0;
-                                
-                            default:
-                                return false;
-                        }
-                    }
-                    @Override
-                    public void run() {
-                        
-                        Vector newPos = agent.getPosition().clone();
-                        newPos.add(agent.getDirection().clone().scale(agent.getStepSize()));
-                        
-                        boolean wouldHitAWall = (newPos.getX() < 0 || newPos.getY() < 0 || newPos.getX() >= Simulation.this.width || newPos.getY() >= Simulation.this.height);
-                        boolean wouldMeetOtherSpecies = (wouldHitAWall)? false : wasOtherSpeciesPresent(agent.getSpecies(), trailMap[(int) newPos.getX()][(int) newPos.getY()]);
-                        
-                        if (wouldHitAWall || wouldMeetOtherSpecies) {
-                            agent.getDirection().rotate(Math.random() * Math.PI * 2).toUnitVec();
-                        } else {
-                            agent.setPosition(newPos);
-                            depositPheromonesAtCurrentLocation(agent);
-                        }
-                        
-                    }
-                });
-                
-                this.agentSensoryRunnables.add(new Runnable() {
-                    // todo: check whole sensor area
-                    private int getTrailQuantity(int species, Color trailMapCell){
-                        
-                        switch(species) {
-                            case 0://R
-                                return trailMapCell.getRed();
-                            
-                            case 1://G
-                                return trailMapCell.getGreen();
-                            
-                            case 2://B
-                                return trailMapCell.getBlue();
-                                
-                            default:
-                                return 0;
-                        }
-                    }
-                    
-                    @Override
-                    public void run() {
-                        Vector agentPosCopy = agent.getPosition().clone();
-                        Vector agentDir = agent.getPosition();
-                        Vector agentSensorF = agentPosCopy.add(agentDir.clone().scale(agent.getSensorOffset()));
-                        Vector agentSensorFL = agentPosCopy.add(agentDir.clone().rotate(- agent.getSensorAngle()).scale(agent.getSensorOffset()));
-                        Vector agentSensorFR = agentPosCopy.add(agentDir.clone().rotate(agent.getSensorAngle()).scale(agent.getSensorOffset()));
-                        
-                        int Fx = Math.max(0, Math.min(Simulation.this.width - 1, (int) agentSensorF.getX()));
-                        int Fy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorF.getY()));
-                        int FLx = Math.max(0, Math.min(Simulation.this.width - 1, (int) agentSensorFL.getX()));
-                        int FLy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorFL.getY()));
-                        int FRx = Math.max(0, Math.min(Simulation.this.width - 1, (int) agentSensorFR.getX()));
-                        int FRy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorFR.getY()));
-                        
-                        int F = getTrailQuantity(agent.getSpecies(), trailMap[Fx][Fy]);
-                        int FL = getTrailQuantity(agent.getSpecies(), trailMap[FLx][FLy]);
-                        int FR = getTrailQuantity(agent.getSpecies(), trailMap[FRx][FRy]);
-                        
-                        if (F > FL && F > FR) {
-                            // do nothing
-                            
-                        } else if (F < FL && F >FR) {
-                            if (Math.random() > 0.5) {
-                                agentDir.rotate(agent.getRotationAngle()).toUnitVec();
-                            } else {
-                                agentDir.rotate(-agent.getRotationAngle()).toUnitVec();
-                            }
-                            
-                        } else if (F < FL) {
-                            agentDir.rotate(-agent.getRotationAngle()).toUnitVec();
-                        
-                        } else if (F < FR) {
-                            agentDir.rotate(agent.getRotationAngle()).toUnitVec();
-                        }
-                    }
-                });
-            }
+    private boolean wasOtherSpeciesPresent(int species, Color trailMapCell) {
+
+        switch(species) {
+            case 0://R
+                return trailMapCell.getGreen() != 0 && trailMapCell.getBlue() != 0;
+
+            case 1://G
+                return trailMapCell.getRed() != 0 && trailMapCell.getBlue() != 0;
+
+            case 2://B
+                return trailMapCell.getRed() != 0 && trailMapCell.getGreen() != 0;
+
+            default:
+                return false;
         }
-        
-        /*for (int i = 0; i < this.height; i++) {
-            int lineToDecay = i;
-            this.trailDecayerRunnables.add(new Runnable() {
-                @Override
-                public void run() {
-                    Color currentCellColor;
-                    
-                    for (int j = 0; j < Simulation.this.width; j++) {
-                        Simulation.this.trailMap[i][j] = Color.black;
-                    }
-                    
-                }
-            });
-        }*/
     }
     
-    private synchronized void depositPheromonesAtCurrentLocation(Agent agent) {
+    private void executeMotorStage(Agent agent) {
+                        
+        Vector newPos = agent.getPosition().clone();
+        newPos.add(agent.getDirection().clone().scale(agent.getStepSize()));
+
+        boolean wouldHitAWall = (newPos.getX() < 0 || newPos.getY() < 0 || newPos.getX() >= Simulation.this.width || newPos.getY() >= Simulation.this.height);
+        boolean wouldMeetOtherSpecies = (wouldHitAWall)? false : wasOtherSpeciesPresent(agent.getSpecies(), trailMap[(int) newPos.getX()][(int) newPos.getY()]);
+
+        if (wouldHitAWall || wouldMeetOtherSpecies) {
+            agent.getDirection().rotate(Math.random() * Math.PI * 2).toUnitVect();
+        } else {
+            agent.setPosition(newPos);
+            depositPheromonesAtCurrentLocation(agent);
+        }
+        
+    }
+    
+    private int getTrailQuantity(int species, Color trailMapCell){
+        
+        // todo: check whole sensor area                
+        switch(species) {
+            case 0://R
+                return trailMapCell.getRed();
+
+            case 1://G
+                return trailMapCell.getGreen();
+
+            case 2://B
+                return trailMapCell.getBlue();
+
+            default:
+                return 0;
+        }
+    }
+    
+    private void executeSensoryStage(Agent agent) {
+        Vector agentPos = agent.getPosition();
+        Vector agentDir = agent.getDirection();
+        Vector agentSensorF = agentPos.clone().add(agentDir.clone().scale(agent.getSensorOffset()));
+        Vector agentSensorFL = agentPos.clone().add(agentDir.clone().rotate(- agent.getSensorAngle()).scale(agent.getSensorOffset()));
+        Vector agentSensorFR = agentPos.clone().add(agentDir.clone().rotate(agent.getSensorAngle()).scale(agent.getSensorOffset()));
+
+        int Fx = Math.max(0, Math.min(Simulation.this.width - 1, (int) agentSensorF.getX()));
+        int Fy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorF.getY()));
+        int FLx = Math.max(0, Math.min(Simulation.this.width - 1, (int) agentSensorFL.getX()));
+        int FLy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorFL.getY()));
+        int FRx = Math.max(0, Math.min(Simulation.this.width - 1, (int) agentSensorFR.getX()));
+        int FRy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorFR.getY()));
+
+        int F = getTrailQuantity(agent.getSpecies(), trailMap[Fx][Fy]);
+        int FL = getTrailQuantity(agent.getSpecies(), trailMap[FLx][FLy]);
+        int FR = getTrailQuantity(agent.getSpecies(), trailMap[FRx][FRy]);
+
+        if (F > FL && F > FR) {
+            // do nothing
+
+        } else if (F < FL && F >FR) {
+            if (Math.random() > 0.5) {
+                agentDir.rotate(agent.getRotationAngle()).toUnitVect();
+            } else {
+                agentDir.rotate(-agent.getRotationAngle()).toUnitVect();
+            }
+
+        } else if (F < FL) {
+            agentDir.rotate(-agent.getRotationAngle()).toUnitVect();
+
+        } else if (F < FR) {
+            agentDir.rotate(agent.getRotationAngle()).toUnitVect();
+        }
+    }
+    
+    private void depositPheromonesAtCurrentLocation(Agent agent) {
         int x = (int) agent.getPosition().getX();
         int y = (int) agent.getPosition().getY();
         Color color = this.trailMap[x][y];
-        
-        
-        //System.out.print(this.trailMap[x][y].getRed() + " --> ");
         
         switch (agent.getSpecies()) {
             case 0://R
@@ -274,10 +228,7 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
             case 2://B
                 int bluePlusDep = Math.min(255, color.getBlue() + agent.getDepositionT()); 
                 this.trailMap[x][y] = new Color(color.getRed(), color.getGreen(), bluePlusDep);
-                return;        
         }
-        
-        //System.out.println(this.trailMap[x][y].getRed());
     }
 
     public int getWidth() {
@@ -358,17 +309,71 @@ public class Simulation implements Runnable, SimuUpdateEventSender {
         }
     }
 
-    private void decayTrailsNonConcurrent() {
+    private void diffuseTrails() {
+        
+        Color[][] trailMap = new Color[this.width][this.height];
+        
+        for (int i = 0; i < trailMap.length; i++) {
+            for (int j = 0; j < trailMap[0].length; j++) {
+                trailMap[i][j] = calcDiffusionAt(i, j, Constants.SIMU_DIFFUSION_RANGE);
+            }
+        }
+        this.trailMap = trailMap;
+    }
+    
+    private Color calcDiffusionAt(int x, int y, int diffusionRange) {
+        
+        int iStart = x - diffusionRange;
+        int iEnd = x + diffusionRange + 1;
+        
+        int jStart = y - diffusionRange;
+        int jEnd = y + diffusionRange + 1;
+        
+        int R = 0;
+        int G = 0;
+        int B = 0;
+        
+        int totalCells = 0;
+        //int totalCells = 2 * diffusionRange + 1;
+        
+        for (int i = iStart; i < iEnd; i++) {
+            for (int j = jStart; j < jEnd; j++) {
+                if (i != x && j != y && i >= 0 && i < this.width && j >= 0 && j < this.height) {
+                    R += this.trailMap[i][j].getRed();
+                    G += this.trailMap[i][j].getGreen();
+                    B += this.trailMap[i][j].getBlue();
+                    totalCells++;
+                }
+            }
+        }
+        
+        R /= totalCells;
+        G /= totalCells;
+        B /= totalCells;
+        
+        R = sanitizeValue(R, 0, 255);
+        G = sanitizeValue(G, 0, 255);
+        B = sanitizeValue(B, 0, 255);
+        
+        return new Color(R, G, B);
+    }
+    
+    private void decayTrails() {
         
         Color currentColor;
         
         for (int i = 0; i < this.width; i++) {
             for (int j = 0; j < this.height; j++) {
                 currentColor = this.trailMap[i][j];
-                this.trailMap[i][j] = new Color(
+                /*this.trailMap[i][j] = new Color(
                         sanitizeValue(currentColor.getRed() - this.trailsDecayValues[0], 0, 255),
                         sanitizeValue(currentColor.getGreen() - this.trailsDecayValues[1], 0, 255),
                         sanitizeValue(currentColor.getBlue() - this.trailsDecayValues[2], 0, 255)
+                );*/
+                this.trailMap[i][j] = new Color(
+                        sanitizeValue(currentColor.getRed() * (1 - (this.trailsDecayValues[0] / 100)), 0, 255),
+                        sanitizeValue(currentColor.getGreen() * (1 - (this.trailsDecayValues[1] / 100)), 0, 255),
+                        sanitizeValue(currentColor.getBlue() * (1 - (this.trailsDecayValues[2] / 100)), 0, 255)
                 );
             }
         }

@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import physarum_2d.controller.Simulation;
+import physarum_2d.view.Constants;
 
 /**
  *
@@ -31,12 +32,12 @@ public class Species {
                 speciesIdD,
                 Vector.randomVector(0, simulation.getWidth(), 0, simulation.getHeight()),
                 Vector.randomUnitVect(),
-                Math.PI / 8,
-                9,
-                Math.PI / 4,
+                (Math.PI / 8) / Math.PI,
+                90,
+                (Math.PI / 8) / Math.PI,
                 1,
-                1,
-                5,
+                Constants.SIMU_STEP_SIZE,
+                Constants.SIMU_DEP_T,
                 0f 
             ));
         }

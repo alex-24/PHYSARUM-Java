@@ -28,8 +28,6 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
     private Simulation simulation;
     private final List<AgentObserver> agentObservers = new ArrayList<>();
     private final TrailMapObserver trailMapObserver;
-    private final List<Runnable> agentGUIRunnables = new ArrayList();
-    private final List<Thread> agentGUIThreads = new ArrayList();
 
 
 
@@ -41,17 +39,13 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
         setSize(this.simulation.getWidth(), this.simulation.getHeight());
         
         // OBSERVER : trail map
-        this.trailMapObserver = new TrailMapObserver(
-                this.simulation.getTrailMap(),
-                this.simulation.getIsSpeciesActive(),
-                this.simulation.getSpeciesColors());
+        this.trailMapObserver = new TrailMapObserver(this.simulation);
            
         // OBSERVER : agents
         for (Species species : this.simulation.getSpecies()){
             for (Agent agent : species.getAgents()) {
-                AgentObserver agentObserver = new AgentObserver(agent, species.getColor());
+                AgentObserver agentObserver = new AgentObserver(this.simulation, agent, species.getColor());
                 this.agentObservers.add(agentObserver);
-                this.agentGUIRunnables.add((Runnable) () -> agentObserver.print(SimulationPanel.this.getGraphics()));
             }
         }
         
@@ -64,29 +58,7 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
         System.out.println("PAINTING GRAPHIC");
         
         this.trailMapObserver.print(g);
-        /*for (Runnable agentGUIRunnable : this.agentGUIRunnables) {
-            agentGUIRunnable.run();
-        }*/
-        for (AgentObserver agentObserver : agentObservers) {
-            agentObserver.print(g);
-        }
-        /*try {
-            this.agentGUIThreads.clear();
-            
-            this.agentGUIRunnables.stream().map((r) -> {
-                this.agentGUIThreads.add(new Thread(r));
-                return r;
-            });
-            
-            this.agentGUIThreads.stream().forEachOrdered((_item) -> _item.start());
-
-            for (Thread t : this.agentGUIThreads) {
-                t.join();
-            }
-            
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SimulationPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        //this.agentObservers.forEach((agentObserver) -> agentObserver.print(g));
     }
     
     
@@ -96,21 +68,5 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
         System.out.println("SIMU UPDATE EVENT RECEIVED");
         repaint();
     }
-
-    /*public Simulation getSimulation() {
-        return simulation;
-    }
-
-    
-    public void setSimulation(Simulation simulation) {
-        this.simulation = simulation;
-        setSize(this.simulation.getWidth(), this.simulation.getHeight());
-        onSimuUpdateEventTriggered();
-    }*/
-
-    
-    
-    
-    
     
 }
