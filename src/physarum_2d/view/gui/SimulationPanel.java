@@ -63,8 +63,12 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
         if (Constants.GUI_DRAW_TRAIL_MAP) {
             this.trailMapObserver.print(g);
         }
-        if (Constants.GUI_DRAW_AGENTS) {
+        if (Constants.GUI_DRAW_ALL_AGENTS) {
             this.agentObservers.forEach((agentObserver) -> agentObserver.print(g));
+        }else if (Constants.GUI_DRAW_SINGLE_AGENT) {
+            if (this.agentObservers.get(0) != null) {
+                this.agentObservers.get(0).print(g);
+            }
         }
     }
     

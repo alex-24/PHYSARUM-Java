@@ -201,7 +201,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         boolean wouldMeetOtherSpecies = (wouldHitAWall)? false : wasOtherSpeciesPresent(agent.getSpecies(), trailMap[(int) newPos.getX()][(int) newPos.getY()]);
 
         if (wouldHitAWall || wouldMeetOtherSpecies) {
-            agent.getDirection().rotate(this.random.nextDouble() * Math.PI * 2).toUnitVect();
+            agent.getDirection().rotateRandomly().toUnitVect();
         } else {
             agent.setPosition(newPos);
             storeDeposit(agent);
@@ -258,11 +258,11 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
 
         if (F > FL && F > FR) {
             if (F < 0) {
-                agent.getDirection().rotate(random.nextDouble() * Math.PI * 2).toUnitVect();
+                agent.getDirection().rotateRandomly().toUnitVect();
             }
 
         } else if (F < FL && F >FR) {
-            if (Math.random() > 0.5) {
+            if (random.nextDouble() > 0.5) {
                 agentDir.rotate(agent.getRotationAngle()).toUnitVect();
             } else {
                 agentDir.rotate(-agent.getRotationAngle()).toUnitVect();
@@ -314,7 +314,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
             for (Vector location : depositOfSpecies) {
                 int x = (int) location.getX();
                 int y = (int) location.getY();
-                diffuseDeposit(x, y);
+                
                 
                 trailMapCell = this.trailMap[x][y];
 
@@ -337,6 +337,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
                             this.trailMap[x][y] = new Color(trailMapCell.getRed(), trailMapCell.getGreen(), bluePlusDep);
                     }
                 }
+                diffuseDeposit(x, y);
             }
         }
         
@@ -381,7 +382,8 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         
         for (int i = 0; i < trailMap.length; i++) {
             for (int j = 0; j < trailMap[0].length; j++) {
-                trailMap[i][j] = blendTrail(this.trailMap[i][j], calcDiffusionAt(i, j));
+                //trailMap[i][j] = blendTrail(this.trailMap[i][j], calcDiffusionAt(i, j));
+                trailMap[i][j] = calcDiffusionAt(i, j);
             }
         }
         this.trailMap = trailMap;
@@ -412,9 +414,9 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         int G = 0;
         int B = 0;
         
-        //int totalCells = 0;
-        int ownCellWeight = 3;
-        int totalCells = 2 * this.diffusionKernel + ownCellWeight;
+        int totalCells = 0;
+        int ownCellWeight = 1;
+        //int totalCells = 2 * this.diffusionKernel + ownCellWeight;
         
         for (int i = iStart; i < iEnd; i++) {
             for (int j = jStart; j < jEnd; j++) {
@@ -422,7 +424,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
                     R += this.trailMap[i][j].getRed() * ((i == x && j == y)? ownCellWeight : 1);
                     G += this.trailMap[i][j].getGreen() * ((i == x && j == y)? ownCellWeight : 1);
                     B += this.trailMap[i][j].getBlue() * ((i == x && j == y)? ownCellWeight : 1);
-                    //totalCells++;
+                    totalCells++;
                 }
             }
         }

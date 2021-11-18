@@ -37,7 +37,7 @@ public class Vector {
     }
     
     public static Vector randomUnitVect() {
-        return new Vector(random.nextDouble() * 200, random.nextDouble() * 200).toUnitVect();
+        return new Vector(random.nextDouble() * 200 - 100, random.nextDouble() * 200 - 100).toUnitVect();
     }
     
     
@@ -87,6 +87,11 @@ public class Vector {
 
         this.x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
         this.y = tmpX * Math.sin(angle) + this.y * Math.cos(angle);
+        return this;	
+    }
+
+    public Vector rotateRandomly(){
+        rotate((random.nextDouble() * Math.PI * 4 - Math.PI) / Math.PI);
         return this;	
     }
 
