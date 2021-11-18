@@ -19,19 +19,19 @@ public class Agent {
     private double sensorAngle;
     private double sensorOffset;
     private double rotationAngle;
-    private int sensorWidth;
+    private int sensorRange;
     private int stepSize;
     private int depositionT;
     private double probChangeDir;
 
-    public Agent(int species, Vector position, Vector direction, double sensorAngle, double sensorOffset, double rotationAngle, int sensorWidth, int stepSize, int depositionT, double probChangeDir) {
+    public Agent(int species, Vector position, Vector direction, double sensorAngle, double sensorOffset, double rotationAngle, int sensorRange, int stepSize, int depositionT, double probChangeDir) {
         this.species = species;
         this.position = position;
         this.direction = direction;
         this.sensorAngle = sensorAngle;
         this.sensorOffset = sensorOffset;
         this.rotationAngle = rotationAngle;
-        this.sensorWidth = sensorWidth;
+        this.sensorRange = sensorRange;
         this.stepSize = stepSize;
         this.depositionT = depositionT;
         this.probChangeDir = probChangeDir;
@@ -87,12 +87,12 @@ public class Agent {
         this.rotationAngle = rotationAngle;
     }
 
-    public int getSensorWidth() {
-        return sensorWidth;
+    public int getSensorRange() {
+        return sensorRange;
     }
 
-    public void setSensorWidth(int sensorWidth) {
-        this.sensorWidth = sensorWidth;
+    public void setSensorRange(int sensorRange) {
+        this.sensorRange = sensorRange;
     }
 
     public int getStepSize() {

@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import physarum_2d.controller.Simulation;
 import physarum_2d.model.Agent;
 import physarum_2d.model.Species;
+import physarum_2d.view.Constants;
 import physarum_2d.view.gui.observers.AgentObserver;
 import physarum_2d.view.gui.observers.TrailMapObserver;
 import physarum_2d.view.GUIObserver;
@@ -43,9 +44,11 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
            
         // OBSERVER : agents
         for (Species species : this.simulation.getSpecies()){
-            for (Agent agent : species.getAgents()) {
-                AgentObserver agentObserver = new AgentObserver(this.simulation, agent, species.getColor());
-                this.agentObservers.add(agentObserver);
+            if (species != null) {
+                for (Agent agent : species.getAgents()) {
+                    AgentObserver agentObserver = new AgentObserver(this.simulation, agent, species.getColor());
+                    this.agentObservers.add(agentObserver);
+                }
             }
         }
         
@@ -57,15 +60,19 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
         
         System.out.println("PAINTING GRAPHIC");
         
-        this.trailMapObserver.print(g);
-        this.agentObservers.forEach((agentObserver) -> agentObserver.print(g));
+        if (Constants.GUI_DRAW_TRAIL_MAP) {
+            this.trailMapObserver.print(g);
+        }
+        if (Constants.GUI_DRAW_AGENTS) {
+            this.agentObservers.forEach((agentObserver) -> agentObserver.print(g));
+        }
     }
     
     
     
     @Override
     public void onSimuUpdateEventTriggered() {
-        System.out.println("SIMU UPDATE EVENT RECEIVED");
+        System.out.println("<- SIMU UPDATE EVENT RECEIVED");
         repaint();
     }
     

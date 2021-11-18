@@ -26,12 +26,13 @@ public class AppWindow extends JFrame {
     public AppWindow() {
         
         super("PHYSARUM - A 2D SIMULATION");
-        setSize(new Dimension(Constants.SIMU_WIDTH, Constants.SIMU_HEIGHT));
-        setVisible(true);
         
-        Boolean[] isSpeciesActive = new Boolean[] {true, false, false};
+        setVisible(true);
+        setLocationRelativeTo(null);
+        
+        Boolean[] isSpeciesActive = Constants.SIMU_IS_SPECIES_ACTIVE;
         Color[] speciesColors = new Color[] {Color.RED, Color.GREEN, Color.BLUE};
-        int[] speciesDecayPercentage = new int[] {Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T};
+        int[] speciesDecayPercentage = new int[] {Constants.SIMU_DECAY_T, Constants.SIMU_DECAY_T, Constants.SIMU_DECAY_T};
         
         Simulation simulation = new Simulation(
                 Constants.SIMU_WIDTH,
@@ -44,9 +45,9 @@ public class AppWindow extends JFrame {
                 0
         );
         
-        Thread simulationThread = new Thread(simulation);
 
         simulationPanel = new SimulationPanel(simulation);
+        
         setLayout(new BorderLayout(0, 0));
 
         optionsPanel = new JPanel();
@@ -56,17 +57,19 @@ public class AppWindow extends JFrame {
         //simulationPanel.add(optionsPanel, BorderLayout.LINE_START);
 
 
+        simulationPanel.setPreferredSize(new Dimension(Constants.SIMU_WIDTH, Constants.SIMU_HEIGHT));
+        
         // color debugging
         simulationPanel.setBackground(Color.WHITE);
         //optionsPanel.setBackground(Color.RED);
         setBackground(Color.BLACK);
         //setContentPane(simulationPanel);
         add(simulationPanel);
-        //pack();
+        pack();
         //setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        simulationThread.start();
+        simulation.start();
     }
     
 }

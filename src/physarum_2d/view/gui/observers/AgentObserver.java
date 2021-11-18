@@ -63,12 +63,48 @@ public class AgentObserver implements GUIObserver {
         int FRx = Math.max(0, Math.min(this.simulation.getWidth() - 1, (int) agentSensorFR.getX()));
         int FRy = Math.max(0, Math.min(this.simulation.getHeight() - 1, (int) agentSensorFR.getY()));
         
-        //g.setColor(Color.RED);
-        g.drawLine(x, y, Fx, Fy);
-        //g.setColor(Color.GREEN);
+        int qtF = this.simulation.getTrailQuantity(agent.getSpecies(), Constants.SIMU_SENSOR_RANGE, Fx, Fy);
+        int qtFL = this.simulation.getTrailQuantity(agent.getSpecies(), Constants.SIMU_SENSOR_RANGE, FRx, FLy);
+        int qtFR = this.simulation.getTrailQuantity(agent.getSpecies(), Constants.SIMU_SENSOR_RANGE, FRx, FRy);
+        
+        boolean F = false;
+        boolean FL = false;
+        boolean FR = false;
+
+        if (qtF > qtFL && qtF > qtFR) {
+            F = true;
+        } else if (qtF < qtFL && qtF >qtFR) {
+            if (Math.random() > 0.5) {
+                FR = true;
+            } else {
+                FL = true;
+            }
+
+        } else if (qtF < qtFL) {
+            FL = true;
+
+        } else if (qtF < qtFR) {
+            FR = true;
+        }
+        
+        if (FL) g.setColor(Color.CYAN);
         g.drawLine(x, y, FLx, FLy);
-        //g.setColor(Color.BLUE);
+        g.setColor(Color.CYAN);
+        g.fillRect(FLx - agent.getSensorRange(), FLy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
+        g.setColor(this.color.darker().darker());
+        
+        
+        if (FR) g.setColor(Color.YELLOW);
         g.drawLine(x, y, FRx, FRy);
+        g.setColor(Color.YELLOW);
+        g.fillRect(FRx - agent.getSensorRange(), FRy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
+        g.setColor(this.color.darker().darker());
+        
+        
+        if (F) g.setColor(Color.MAGENTA);
+        g.drawLine(x, y, Fx, Fy);
+        g.setColor(Color.MAGENTA);
+        g.fillRect(Fx - agent.getSensorRange(), Fy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
     }
     
 }

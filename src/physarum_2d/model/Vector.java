@@ -5,11 +5,15 @@
  */
 package physarum_2d.model;
 
+import java.util.Random;
+
 /**
  *
  * @author Alexis Cassion
  */
 public class Vector {
+    private static final Random random = new Random();
+    
     private double x;
     private double y;
 
@@ -25,15 +29,15 @@ public class Vector {
     
     public static Vector randomVector(double minX, double maxX, double minY, double maxY) {
         Vector result = new Vector(
-                (maxX - minX) * Math.random() + minX,
-                (maxY - minY) * Math.random() + minY
+                (maxX - minX) * random.nextDouble() + minX,
+                (maxY - minY) * random.nextDouble() + minY
         );
         
         return result;
     }
     
     public static Vector randomUnitVect() {
-        return new Vector(1, 1).rotate(Math.random() * Math.PI).toUnitVect();
+        return new Vector(random.nextDouble() * 200, random.nextDouble() * 200).toUnitVect();
     }
     
     
