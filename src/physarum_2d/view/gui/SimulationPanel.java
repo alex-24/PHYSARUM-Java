@@ -18,13 +18,17 @@ import physarum_2d.view.Constants;
 import physarum_2d.view.gui.observers.AgentObserver;
 import physarum_2d.view.gui.observers.TrailMapObserver;
 import physarum_2d.view.GUIObserver;
+import physarum_2d.view.GUIUpdateEventListener;
+import physarum_2d.view.GUIUpdateEventSender;
 import physarum_2d.view.SimuUpdateEventListener;
 
 /**
  *
  * @author Alexis Cassion
  */
-public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
+public class SimulationPanel extends JPanel implements SimuUpdateEventListener, GUIUpdateEventSender {
+    
+    private List<GUIUpdateEventListener> guiUpdateListeners = new ArrayList<>();
     
     private Simulation simulation;
     private final List<AgentObserver> agentObservers = new ArrayList<>();
@@ -36,6 +40,7 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
         this.simulation = simulation;
         
         this.simulation.addSimuUpdateEventListener(this);
+        addGUIUpdateEventListener(this.simulation);
         
         setSize(this.simulation.getWidth(), this.simulation.getHeight());
         
@@ -58,7 +63,7 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
     public void paint(Graphics g) {
         super.paint(g); 
         
-        System.out.println("PAINTING GRAPHIC");
+        //System.out.println("PAINTING GRAPHIC");
         
         if (Constants.GUI_DRAW_TRAIL_MAP) {
             this.trailMapObserver.print(g);
@@ -70,14 +75,27 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener {
                 this.agentObservers.get(0).print(g);
             }
         }
+        notifyGUIUpdateEventListeners();
     }
     
     
     
     @Override
     public void onSimuUpdateEventTriggered() {
-        System.out.println("<- SIMU UPDATE EVENT RECEIVED");
+        //System.out.println("<- SIMU UPDATE EVENT RECEIVED");
         repaint();
+    }
+
+    @Override
+    public void addGUIUpdateEventListener(GUIUpdateEventListener listener) {
+        this.guiUpdateListeners.add(listener);
+    }
+
+    @Override
+    public void notifyGUIUpdateEventListeners() {
+        for (GUIUpdateEventListener listener : this.guiUpdateListeners) {
+            listener.onGUIUpdateEventTriggered();
+        }
     }
     
 }

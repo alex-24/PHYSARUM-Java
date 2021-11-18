@@ -22,14 +22,17 @@ import physarum_2d.model.Vector;
 import physarum_2d.view.SimuUpdateEventListener;
 import physarum_2d.view.SimuUpdateEventSender;
 import physarum_2d.view.Constants;
+import physarum_2d.view.GUIUpdateEventListener;
 
 /**
  *
  * @author Alexis Cassion
  */
-public class Simulation extends Thread implements SimuUpdateEventSender {
+public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpdateEventListener {
     
     private static final Random random = new Random();
+    private boolean waitForGUIUpdate = true;
+    private boolean isSimulationPaused = false;
     
     
     private final List<SimuUpdateEventListener> simuUpdateEventListeners = new ArrayList<>();
@@ -43,32 +46,12 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
     
     
     private List<Species> species = new ArrayList<>();
-    List<Vector>[] storedDeposits;
     
     private Color[][] trailMap;
     Boolean[] isSpeciesActive;
     private int[] trailsDecayValues;
     private int nbOfSpecies;
     
-    /*private ScheduledExecutorService diffusionExecutor = Executors.newSingleThreadScheduledExecutor();
-    private Runnable diffusionRunnable = new Runnable() {
-        @Override
-        public void run() {
-            // TRAIL DIFFUSION -------------------------------------------------
-            System.out.println("DIFFUSION STAGE");
-            diffuseEntireTrailMap();
-        }  
-    };
-    
-    private ScheduledExecutorService decayExecutor = Executors.newSingleThreadScheduledExecutor();
-    private Runnable decayRunnable = new Runnable() {
-        @Override
-        public void run() {
-            // TRAIL DECAY -------------------------------------------------
-            System.out.println("DECAY STAGE");
-            decayEntireTrailMap();
-        }  
-    };*/
 
     public Simulation(int width, int height, int populationPercentage, Boolean[] isSpeciesActive, Color[] speciesColor, int[] trailsDecayValues, int diffusionKernel, float wProj) {
         this.width = width;
@@ -91,17 +74,11 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         
         this.nbOfSpecies = (int) Arrays.stream(this.isSpeciesActive, 0, this.isSpeciesActive.length).filter(t -> t).count();
         
-        this.storedDeposits = new ArrayList[this.isSpeciesActive.length];
-        
-        for (int i = 0; i < this.storedDeposits.length; i++) {
-            this.storedDeposits[i] = new ArrayList<>();
-        }
-        
         int speciesPopulation = totalPopulation / this.nbOfSpecies;
         
-        System.out.println("Population of : " + totalPopulation);
-        System.out.println(this.nbOfSpecies + " species");
-        System.out.println(speciesPopulation + " per species");
+        //System.out.println("Population of : " + totalPopulation);
+        //System.out.println(this.nbOfSpecies + " species");
+        //System.out.println(speciesPopulation + " per species");
         
         for (int i = 0; i < this.isSpeciesActive.length; i++) {
             if (this.isSpeciesActive[i]){
@@ -116,18 +93,13 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
     @Override
     public void run() {
         
-        //this.diffusionExecutor.scheduleAtFixedRate(this.diffusionRunnable, 1, Constants.SIMU_DIFFUSION_INTERVAL_IN_MILLIS, TimeUnit.MILLISECONDS);
-        //this.decayExecutor.scheduleAtFixedRate(this.decayRunnable, 1, Constants.SIMU_DECAY_INTERVAL_IN_MILLIS, TimeUnit.MILLISECONDS);
-        
         while (true) {
             try {
-                System.out.println("-------------------------------------------------");
-                // System.out.println("--" + this.species.get(0).getAgents().get(0).getPosition());
-                //System.out.println("--" + this.species.get(0).getAgents().get(0).getDirection());
-                
+                this.waitForGUIUpdate = true;
+                //System.out.println("-------------------------------------------------");
                 // MOTOR STAGE -------------------------------------------------
-                //Collections.shuffle(this.species);
-                System.out.println("MOTOR STAGE");
+                Collections.shuffle(this.species);
+                //System.out.println("MOTOR STAGE");
                 Collections.shuffle(this.species);
                 for (int i=0; i<this.species.size(); i++) {
                     if (this.species.get(i) != null) {
@@ -138,8 +110,8 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
                 }
                 
                 
-                System.out.println("SENSORY STAGE");
                 // SENSORY STAGE -----------------------------------------------
+                //System.out.println("SENSORY STAGE");
                 //Collections.shuffle(this.species);
                 for (int i=0; i<this.species.size(); i++) {
                     if (this.species.get(i) != null) {
@@ -151,22 +123,16 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
                 
                 
                 // TRAIL DIFFUSION -------------------------------------------------
-                System.out.println("DIFFUSION STAGE");
-                diffuseEntireTrailMap();
-
-                // TRAIL DECAY -------------------------------------------------
-                System.out.println("DECAY STAGE");
-                decayEntireTrailMap();
-                
-                
-                // DEPOSIT -------------------------------------------------
-                System.out.println("DEPOSIT STAGE");
-                //placeStoredDeposits();
+                //System.out.println("DIFFUSION STAGE");
+                diffuseAndDecayTrailMap();
                 
                 
                 // DELAY NEXT SIMULATION STEP FOR GUI
                 notifySimuUpdateEventListeners();
-                Thread.sleep(Constants.SIMU_UPDATE_INTERVAL_IN_MILLIS);
+                
+                while (this.waitForGUIUpdate || this.isSimulationPaused) {
+                    Thread.sleep(1);
+                }
                 
             } catch (InterruptedException ex) {
                 Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
@@ -204,7 +170,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
             agent.getDirection().rotateRandomly().toUnitVect();
         } else {
             agent.setPosition(newPos);
-            storeDeposit(agent);
+            deposit(agent);
         }
         
     }
@@ -276,7 +242,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         }
     }
     
-    private void storeDeposit(Agent agent) {
+    private void deposit(Agent agent) {
         int x = (int) agent.getPosition().getX();
         int y = (int) agent.getPosition().getY();
         Color color = this.trailMap[x][y];
@@ -298,108 +264,34 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
                 int bluePlusDep = Math.min(255, color.getBlue() + agent.getDepositionT()); 
                 this.trailMap[x][y] = new Color(color.getRed(), color.getGreen(), bluePlusDep);
         }
-        
-        //diffuseDeposit(x, y);
-    }
-    
-    private void placeStoredDeposits() {
-        
-        Color trailMapCell;
-        Agent firstAgent;
-        List<Vector> depositOfSpecies;
-        
-        for (int i=0; i<this.storedDeposits.length; i++) {
-            depositOfSpecies = this.storedDeposits[i];
-            
-            for (Vector location : depositOfSpecies) {
-                int x = (int) location.getX();
-                int y = (int) location.getY();
-                
-                
-                trailMapCell = this.trailMap[x][y];
-
-                if (this.species.get(i) != null) {
-                    firstAgent = this.species.get(i).getAgents().get(0);
-                    
-                    switch (i) {
-                        case 0://R
-                            int redPlusDep = Math.min(255, trailMapCell.getRed() + firstAgent.getDepositionT());
-                            this.trailMap[x][y] = new Color(redPlusDep, trailMapCell.getGreen(), trailMapCell.getBlue());
-                            break;
-
-                        case 1://G
-                            int greenPlusDep = Math.min(255, trailMapCell.getGreen() + firstAgent.getDepositionT()); 
-                            this.trailMap[x][y] = new Color(trailMapCell.getRed(), greenPlusDep, trailMapCell.getBlue());
-                            break;
-
-                        case 2://B
-                            int bluePlusDep = Math.min(255, trailMapCell.getBlue() + firstAgent.getDepositionT()); 
-                            this.trailMap[x][y] = new Color(trailMapCell.getRed(), trailMapCell.getGreen(), bluePlusDep);
-                    }
-                }
-                diffuseDeposit(x, y);
-            }
-        }
-        
-        for (int i = 0; i < this.storedDeposits.length; i++) {
-            this.storedDeposits[i].clear();
-        }
     }
 
-    private void diffuseDeposit(int x, int y) {
+    private void diffuseAndDecayTrailMap() {
         
-        int diffusionAreaSize = (2 * this.diffusionKernel) + 1;
-        Color[][] difusionArea = new Color[diffusionAreaSize][diffusionAreaSize];
-        int relative_i;
-        int relative_j;
-        
-        for (int i = x - this.diffusionKernel; i < x + this.diffusionKernel + 1; i++) {
-            
-            relative_i = i - (x - this.diffusionKernel);
-            
-            for (int j = y - this.diffusionKernel; j < y + this.diffusionKernel + 1; j++) {
-                relative_j = j - (y - this.diffusionKernel);
-                difusionArea[relative_i][relative_j] = calcDiffusionAt(i, j);
-            }
-        }
-        
-        for (int i = x - this.diffusionKernel; i < x + this.diffusionKernel + 1; i++) {
-            
-            relative_i = i - (x - this.diffusionKernel);
-            
-            for (int j = y - this.diffusionKernel; j < y + this.diffusionKernel + 1; j++) {
-                relative_j = j - (y - this.diffusionKernel);
-                if (i >= 0 && i < this.width && j >= 0 && j < this.height){
-                    this.trailMap[i][j] = difusionArea[relative_i][relative_j];
-                }
-            }
-        }
-    }
-
-    private void diffuseEntireTrailMap() {
-        
+        // diffuse
         Color[][] trailMap = new Color[this.width][this.height];
         
         for (int i = 0; i < trailMap.length; i++) {
             for (int j = 0; j < trailMap[0].length; j++) {
-                //trailMap[i][j] = blendTrail(this.trailMap[i][j], calcDiffusionAt(i, j));
                 trailMap[i][j] = calcDiffusionAt(i, j);
             }
         }
         this.trailMap = trailMap;
-    }
-    
-    public static Color blendTrail(Color t1, Color t2) {
-        double totalAlpha = t1.getAlpha() + t2.getAlpha();
-        double weight0 = t1.getAlpha() / totalAlpha;
-        double weight1 = t2.getAlpha() / totalAlpha;
-
-        double r = weight0 * t1.getRed() + weight1 * t2.getRed();
-        double g = weight0 * t1.getGreen() + weight1 * t2.getGreen();
-        double b = weight0 * t1.getBlue() + weight1 * t2.getBlue();
-        double a = Math.max(t1.getAlpha(), t2.getAlpha());
-
-        return new Color((int) r, (int) g, (int) b, (int) a);
+        
+        Color currentColor;
+        double decayFactor = (100.0 - Constants.SIMU_DECAY_PERCENTAGE_T) / 100.0;
+        
+        // decay
+        for (int i = 0; i < this.width; i++) {
+            for (int j = 0; j < this.height; j++) {
+                currentColor = this.trailMap[i][j];
+                
+                this.trailMap[i][j] = new Color(
+                        Math.max((int)(currentColor.getRed()  * decayFactor), 0),
+                        Math.max((int)(currentColor.getGreen()* decayFactor), 0),
+                        Math.max((int)(currentColor.getBlue() * decayFactor), 0));
+            }
+        }
     }
     
     private Color calcDiffusionAt(int x, int y) {
@@ -415,15 +307,14 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         int B = 0;
         
         int totalCells = 0;
-        int ownCellWeight = 1;
-        //int totalCells = 2 * this.diffusionKernel + ownCellWeight;
+        //int totalCells = ((int) Math.pow((2 * this.diffusionKernel + 1), 2));
         
         for (int i = iStart; i < iEnd; i++) {
             for (int j = jStart; j < jEnd; j++) {
-                if (/*i != x && j != y && */i >= 0 && i < this.width && j >= 0 && j < this.height) {
-                    R += this.trailMap[i][j].getRed() * ((i == x && j == y)? ownCellWeight : 1);
-                    G += this.trailMap[i][j].getGreen() * ((i == x && j == y)? ownCellWeight : 1);
-                    B += this.trailMap[i][j].getBlue() * ((i == x && j == y)? ownCellWeight : 1);
+                if (i >= 0 && i < this.width && j >= 0 && j < this.height) {
+                    R += this.trailMap[i][j].getRed();
+                    G += this.trailMap[i][j].getGreen();
+                    B += this.trailMap[i][j].getBlue();
                     totalCells++;
                 }
             }
@@ -433,36 +324,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         G /= totalCells;
         B /= totalCells;
         
-        R = clampValue(R, 0, 255);
-        G = clampValue(G, 0, 255);
-        B = clampValue(B, 0, 255);
-        
         return new Color(R, G, B);
-    }
-    
-    private void decayEntireTrailMap() {
-        
-        Color currentColor;
-        
-        for (int i = 0; i < this.width; i++) {
-            for (int j = 0; j < this.height; j++) {
-                currentColor = this.trailMap[i][j];
-                this.trailMap[i][j] = new Color(
-                        clampValue(currentColor.getRed() - this.trailsDecayValues[0], 0, 255),
-                        clampValue(currentColor.getGreen() - this.trailsDecayValues[1], 0, 255),
-                        clampValue(currentColor.getBlue() - this.trailsDecayValues[2], 0, 255)
-                );
-                /*this.trailMap[i][j] = new Color(
-                        clampValue((int) (currentColor.getRed() / 100) * (100 - this.trailsDecayValues[0]), 0, 255),
-                        clampValue((int) (currentColor.getGreen() / 100) * (100 - this.trailsDecayValues[1]), 0, 255),
-                        clampValue((int) (currentColor.getBlue() / 100) * (100 - this.trailsDecayValues[2]), 0, 255)
-                );*/
-            }
-        }
-    }
-    
-    private int clampValue(int value, int min, int max) {
-        return Math.max(Math.min(value, max), 0);
     }
 
     public int getWidth() {
@@ -539,7 +401,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
 
     @Override
     public void notifySimuUpdateEventListeners() {
-        System.out.println("SIMU UPDATE EVENT SENT ->");
+        //System.out.println("SIMU UPDATE EVENT SENT ->");
         for (SimuUpdateEventListener simuUpdateEventListener : this.simuUpdateEventListeners) {
             simuUpdateEventListener.onSimuUpdateEventTriggered();
         }
@@ -556,6 +418,11 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
 
     public int getNbOfSpecies() {
         return this.nbOfSpecies;
+    }
+
+    @Override
+    public void onGUIUpdateEventTriggered() {
+        this.waitForGUIUpdate = false;
     }
     
 }

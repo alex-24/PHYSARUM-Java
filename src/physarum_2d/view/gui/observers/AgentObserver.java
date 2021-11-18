@@ -22,13 +22,16 @@ public class AgentObserver implements GUIObserver {
     
     private final Simulation simulation;
     private final Agent agent;
-    private final Color color;
+    private final Color agentColor;
+    private final Color agentRayscolor;
 
     
     public AgentObserver(Simulation simulation, Agent agent, Color color) {
         this.simulation = simulation;
         this.agent = agent;
-        this.color = color;
+        this.agentColor = color;
+        //this.agentRayscolor = new Color(Color.white.getRGB() - this.agentColor.getRGB());
+        this.agentRayscolor = this.agentColor.brighter().brighter();
     }   
 
     @Override
@@ -42,7 +45,7 @@ public class AgentObserver implements GUIObserver {
         int x = (int) this.agent.getPosition().getX() - aSizeHalf;
         int y = (int) this.agent.getPosition().getY() - aSizeHalf;
         
-        g.setColor(this.color.darker().darker());
+        g.setColor(this.agentRayscolor);
         g.fillOval(x, y, aSize, aSize);
         
         
@@ -91,14 +94,14 @@ public class AgentObserver implements GUIObserver {
         g.drawLine(x, y, FLx, FLy);
         g.setColor(Color.CYAN);
         g.fillRect(FLx - agent.getSensorRange(), FLy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
-        g.setColor(this.color.darker().darker());
+        g.setColor(this.agentRayscolor);
         
         
         if (FR) g.setColor(Color.YELLOW);
         g.drawLine(x, y, FRx, FRy);
         g.setColor(Color.YELLOW);
         g.fillRect(FRx - agent.getSensorRange(), FRy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
-        g.setColor(this.color.darker().darker());
+        g.setColor(this.agentRayscolor);
         
         
         if (F) g.setColor(Color.MAGENTA);
