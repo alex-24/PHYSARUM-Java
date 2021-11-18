@@ -161,7 +161,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
                 
                 // DEPOSIT -------------------------------------------------
                 System.out.println("DEPOSIT STAGE");
-                placeStoredDeposits();
+                //placeStoredDeposits();
                 
                 
                 // DELAY NEXT SIMULATION STEP FOR GUI
@@ -281,9 +281,9 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
         int y = (int) agent.getPosition().getY();
         Color color = this.trailMap[x][y];
         
-        this.storedDeposits[agent.getSpecies()].add(agent.getPosition());
+        //this.storedDeposits[agent.getSpecies()].add(agent.getPosition());
         
-        /*switch (agent.getSpecies()) {
+        switch (agent.getSpecies()) {
             case 0://R
                 int redPlusDep = Math.min(255, color.getRed() + agent.getDepositionT());
                 this.trailMap[x][y] = new Color(redPlusDep, color.getGreen(), color.getBlue());
@@ -297,7 +297,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender {
             case 2://B
                 int bluePlusDep = Math.min(255, color.getBlue() + agent.getDepositionT()); 
                 this.trailMap[x][y] = new Color(color.getRed(), color.getGreen(), bluePlusDep);
-        }*/
+        }
         
         //diffuseDeposit(x, y);
     }
