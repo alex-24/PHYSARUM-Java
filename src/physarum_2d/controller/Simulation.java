@@ -198,9 +198,8 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
                             break;
 
                         case 2://B
-                            ownSpecies += trailMapCell.getGreen();
-                            foreignSpecies += trailMapCell.getRed() + trailMapCell.getBlue();
-                            break;
+                            ownSpecies += trailMapCell.getBlue();
+                            foreignSpecies += trailMapCell.getRed() + trailMapCell.getGreen();
                     }
                 }   
             }
