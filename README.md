@@ -12,7 +12,8 @@
 <div align="center">
   <h3 align="center">2D PHYSARUM SIMULATION</h3>
   <img src="other_ressources/Physarum_polycephalum_network.jpg" alt="illustration" width="500px">
-  <span> Image by <a href="https://commons.wikimedia.org/wiki/User:Tim_Tim_(VD_fr)">Tim Tim (VD fr)</a> on wikipedia</span>
+  <br/>
+  <span> Illustration by <a href="https://commons.wikimedia.org/wiki/User:Tim_Tim_(VD_fr)">Tim Tim (VD fr)</a> on wikipedia</span>
 </div>
 
 
@@ -34,9 +35,9 @@ This algorithm shows a type of emergent process. Complex global patterns are for
 ## Screenshots
 
 <div align="center">
-    <img src="[300x300].pop-15.dep-15.diffR-1.decay-1.step-1_angles-pi4.soff-29.sr-2.JPG" width="300px">
+    <img src="other_ressources/[300x300].pop-15.dep-15.diffR-1.decay-1.step-1_angles-pi4.soff-29.sr-2.JPG" width="300px">
     &nbsp;&nbsp;&nbsp;
-    <img src="[300x300].pop-20.dep-125.diffR-1.decay-1.step-1_angles-pi.soff-29.sr-0.JPG" width="300px">
+    <img src="other_ressources/[300x300].pop-20.dep-125.diffR-1.decay-1.step-1_angles-pi.soff-29.sr-0.JPG" width="300px">
 </div>
 <br/>
 
