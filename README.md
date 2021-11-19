@@ -39,6 +39,13 @@ This algorithm shows a type of emergent process. Complex global patterns are for
     &nbsp;&nbsp;&nbsp;
     <img src="other_ressources/[300x300].pop-20.dep-125.diffR-1.decay-1.step-1_angles-pi.soff-29.sr-0.JPG" width="300px">
 </div>
+
+
+### Interesting incorrect results
+
+<div align="center">
+    <img src="other_ressources/[incorrect][300x300].pop-40.dep-25.diffR-1.decay-2.step-4_angles-pi.soff-3.sr-1.JPG" width="300px">
+</div>
 <br/>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
