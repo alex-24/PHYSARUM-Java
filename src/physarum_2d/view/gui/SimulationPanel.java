@@ -75,6 +75,11 @@ public class SimulationPanel extends JPanel implements SimuUpdateEventListener, 
                 this.agentObservers.get(0).print(g);
             }
         }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SimulationPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         notifyGUIUpdateEventListeners();
     }
     

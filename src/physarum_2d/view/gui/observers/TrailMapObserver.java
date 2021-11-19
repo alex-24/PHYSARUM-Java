@@ -99,7 +99,7 @@ public class TrailMapObserver implements GUIObserver {
         colorBlueWAvg = Math.min(colorBlueWAvg, 255);
         colorAlpha = Math.min((50 + totalDepositAllSpecies * 10), 255);
         
-        return new Color((int) colorRedWAvg, (int) colorGreenWAvg, (int) colorBlueWAvg, (int) colorAlpha);
+        return new Color((int) 255 - colorRedWAvg, (int) 255 - colorGreenWAvg, (int) 255 - colorBlueWAvg, (int) 255);
     }
     
 }

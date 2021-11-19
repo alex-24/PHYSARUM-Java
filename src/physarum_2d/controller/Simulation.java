@@ -96,18 +96,6 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
         while (true) {
             try {
                 this.waitForGUIUpdate = true;
-                //System.out.println("-------------------------------------------------");
-                // MOTOR STAGE -------------------------------------------------
-                Collections.shuffle(this.species);
-                //System.out.println("MOTOR STAGE");
-                Collections.shuffle(this.species);
-                for (int i=0; i<this.species.size(); i++) {
-                    if (this.species.get(i) != null) {
-                        for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
-                            executeMotorStage(this.species.get(i).getAgents().get(j));
-                        }
-                    }
-                }
                 
                 
                 // SENSORY STAGE -----------------------------------------------
@@ -117,6 +105,19 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
                     if (this.species.get(i) != null) {
                         for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
                             executeSensoryStage(this.species.get(i).getAgents().get(j));
+                        }
+                    }
+                }
+                
+                
+                //System.out.println("-------------------------------------------------");
+                // MOTOR STAGE -------------------------------------------------
+                //System.out.println("MOTOR STAGE");
+                //Collections.shuffle(this.species);
+                for (int i=0; i<this.species.size(); i++) {
+                    if (this.species.get(i) != null) {
+                        for (int j=0; j<this.species.get(i).getAgents().size(); j++) {
+                            executeMotorStage(this.species.get(i).getAgents().get(j));
                         }
                     }
                 }
@@ -177,7 +178,8 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
     
     public int getTrailQuantity(int species, int sensorRange, int sensorX, int sensorY){
         
-        int result = 0;
+        int ownSpecies = 0;
+        int foreignSpecies = 0;
         Color trailMapCell;
         
         for (int i = sensorX - sensorRange; i < sensorX + sensorRange + 1; i++) {
@@ -186,22 +188,25 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
                     trailMapCell = this.trailMap[i][j];
                     switch(species) {
                         case 0://R
-                            result += trailMapCell.getRed() - (trailMapCell.getGreen() + trailMapCell.getBlue());
+                            ownSpecies += trailMapCell.getRed();
+                            foreignSpecies += trailMapCell.getGreen() + trailMapCell.getBlue();
                             break;
 
                         case 1://G
-                            result += trailMapCell.getGreen() - (trailMapCell.getRed() + trailMapCell.getBlue());
+                            ownSpecies += trailMapCell.getGreen() ;
+                            foreignSpecies += trailMapCell.getRed() + trailMapCell.getBlue();
                             break;
 
                         case 2://B
-                            result += trailMapCell.getBlue() - (trailMapCell.getRed() + trailMapCell.getGreen());
+                            ownSpecies += trailMapCell.getGreen();
+                            foreignSpecies += trailMapCell.getRed() + trailMapCell.getBlue();
                             break;
                     }
                 }   
             }
         }
         
-        return result;
+        return ownSpecies - foreignSpecies;
     }
     
     private void executeSensoryStage(Agent agent) {
@@ -219,7 +224,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
         int FRy = Math.max(0, Math.min(Simulation.this.height - 1, (int) agentSensorFR.getY()));
 
         int F = getTrailQuantity(agent.getSpecies(), Constants.SIMU_SENSOR_RANGE, Fx, Fy);
-        int FL = getTrailQuantity(agent.getSpecies(), Constants.SIMU_SENSOR_RANGE, FRx, FLy);
+        int FL = getTrailQuantity(agent.getSpecies(), Constants.SIMU_SENSOR_RANGE, FLx, FLy);
         int FR = getTrailQuantity(agent.getSpecies(), Constants.SIMU_SENSOR_RANGE, FRx, FRy);
 
         if (F > FL && F > FR) {
@@ -227,7 +232,7 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
                 agent.getDirection().rotateRandomly().toUnitVect();
             }
 
-        } else if (F < FL && F >FR) {
+        } else if (F < FL && F < FR) {
             if (random.nextDouble() > 0.5) {
                 agentDir.rotate(agent.getRotationAngle()).toUnitVect();
             } else {
