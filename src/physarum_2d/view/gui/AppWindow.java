@@ -32,7 +32,7 @@ public class AppWindow extends JFrame {
         
         Boolean[] isSpeciesActive = Constants.SIMU_IS_SPECIES_ACTIVE;
         Color[] speciesColors = new Color[] {Color.RED, Color.GREEN, Color.BLUE};
-        int[] speciesDecayPercentage = new int[] {Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T, Constants.SIMU_DECAY_PERCENTAGE_T};
+        int[] speciesDecayPercentage = Constants.SIMU_DECAY_PERCENTAGE_T;
         
         Simulation simulation = new Simulation(
                 Constants.SIMU_WIDTH,

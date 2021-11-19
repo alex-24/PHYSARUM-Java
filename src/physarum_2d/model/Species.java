@@ -36,7 +36,7 @@ public class Species {
             position = Vector.randomVector(0, simulation.getWidth(), 0, simulation.getHeight());
             
             if (Constants.SIMU_AGENTS_SHOULD_FACE_CENTER) {
-                direction = position.clone().orientTowardsCoord(new Vector(simulation.getWidth() / 2, simulation.getHeight() / 2)).toUnitVect(); // face screen center
+                direction = position.clone().orientTowardsCoord(new Vector(simulation.getWidth() / 2, simulation.getHeight() / 2)).scale(-1).toUnitVect(); // face screen center
             } else {
                 direction = Vector.randomUnitVect();
             }

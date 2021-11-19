@@ -90,24 +90,26 @@ public class AgentObserver implements GUIObserver {
             FR = true;
         }
         
-        if (FL) g.setColor(Color.CYAN);
-        g.drawLine(x, y, FLx, FLy);
-        g.setColor(Color.CYAN);
-        g.fillRect(FLx - agent.getSensorRange(), FLy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
-        g.setColor(this.agentRayscolor);
-        
-        
-        if (FR) g.setColor(Color.YELLOW);
-        g.drawLine(x, y, FRx, FRy);
-        g.setColor(Color.YELLOW);
-        g.fillRect(FRx - agent.getSensorRange(), FRy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
-        g.setColor(this.agentRayscolor);
-        
-        
-        if (F) g.setColor(Color.MAGENTA);
-        g.drawLine(x, y, Fx, Fy);
-        g.setColor(Color.MAGENTA);
-        g.fillRect(Fx - agent.getSensorRange(), Fy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
+        if (Constants.GUI_DRAW_AGENT_SENSORS) {
+            if (FL) g.setColor(Color.CYAN);
+            g.drawLine(x, y, FLx, FLy);
+            g.setColor(Color.CYAN);
+            g.fillRect(FLx - agent.getSensorRange(), FLy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
+            g.setColor(this.agentRayscolor);
+
+
+            if (FR) g.setColor(Color.YELLOW);
+            g.drawLine(x, y, FRx, FRy);
+            g.setColor(Color.YELLOW);
+            g.fillRect(FRx - agent.getSensorRange(), FRy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
+            g.setColor(this.agentRayscolor);
+
+
+            if (F) g.setColor(Color.MAGENTA);
+            g.drawLine(x, y, Fx, Fy);
+            g.setColor(Color.MAGENTA);
+            g.fillRect(Fx - agent.getSensorRange(), Fy - agent.getSensorRange(), agent.getSensorRange(), agent.getSensorRange());
+        }
     }
     
 }
