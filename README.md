@@ -44,6 +44,10 @@ This algorithm shows a type of emergent process : A complex global pattern is fo
     <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi.soff-3.sr-1.(example-1).JPG" width="200px">
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi.soff-3.sr-1.(example-2).JPG" width="200px">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi.soff-3.sr-1.(example-3).JPG" width="200px">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi.soff-3.sr-1.(example-4).JPG" width="200px">
 </div>
 <br/>
 
