@@ -13,11 +13,12 @@
   <h3 align="center">PHYSARUM SIMULATION (in 2D)</h3>
   <br/>
   <br/>
-  <br/>
   <p><b>V--Goal--V</b></p>
   <img src="other_ressources/Physarum_polycephalum_network.jpg" alt="illustration" width="450px">
   <br/>
   <span> Illustration by <a href="https://commons.wikimedia.org/wiki/User:Tim_Tim_(VD_fr)">Tim Tim (VD fr)</a> on wikipedia</span>
+  <br/>
+  <br/>
 </div>
 
 
