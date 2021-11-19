@@ -42,9 +42,11 @@ public class TrailMapObserver implements GUIObserver {
         Graphics2D g2d = (Graphics2D) g;
         int[] speciesTrailsQuantities = new int[3];
         
-        for (int i = 0; i < trailMap.length; i++) {
-            for (int j = 0; j < trailMap[0].length; j++) {
-                g2d.setColor(trailMap[i][j]);
+        for (int i = 0; i < this.trailMap.length; i++) {
+            for (int j = 0; j < this.trailMap[0].length; j++) {
+                //g2d.setColor(trailMap[i][j]);
+                //g2d.setColor(new Color(255 - trailMap[i][j].getRed(), 255 - trailMap[i][j].getGreen(), 255 - trailMap[i][j].getBlue()));
+                g2d.setColor(calcColor(this.trailMap[i][j]));
                 g2d.fillRect(i, j, 1, 1);
                 //g2d.drawLine(i, j, i, j);
                 /*speciesTrailsQuantities[0] = trailMap[i][j].getRed();
@@ -66,40 +68,34 @@ public class TrailMapObserver implements GUIObserver {
 
     private Color calcColor(Color color) {
         int totalDepositAllSpecies = 0;
-        int[] deposit = new int[this.isSpeciesActive.length];
-        deposit[0] = color.getRed();
-        deposit[1] = color.getGreen();
-        deposit[2] = color.getBlue();
+        double[] colorFactors = new double[this.isSpeciesActive.length];
+        colorFactors[0] = (color.getRed() > 0)? color.getRed() / 255.0 : 0;
+        colorFactors[1] = (color.getGreen() > 0)? color.getGreen() / 255.0 : 0;
+        colorFactors[2] = (color.getBlue() > 0)? color.getBlue() / 255.0 : 0;
         
-        for (int i = 0; i < this.nbOfSpecies; i++) {
-            totalDepositAllSpecies += deposit[i];
-        }
+        double totalFactor = Arrays.stream(colorFactors).sum();
         
-        if (totalDepositAllSpecies == 0)
-            return Constants.SIMU_BACKDROP_COLOR;
-        
-        float colorRedWAvg=0, colorGreenWAvg=0, colorBlueWAvg=0, colorAlpha=0;
-        float[] speciesRatio = new float[this.nbOfSpecies];
+        int R = 0;
+        int G = 0;
+        int B = 0;
         
         for (int i = 0; i < this.isSpeciesActive.length; i++) {
             if (this.isSpeciesActive[i]) {
-                speciesRatio[i] = deposit[i] / 255;
-                colorRedWAvg += (this.speciesColors[i].getRed() * speciesRatio[i]);
-                colorGreenWAvg += (this.speciesColors[i].getGreen()* speciesRatio[i]);
-                colorBlueWAvg += (this.speciesColors[i].getBlue()* speciesRatio[i]);
+                R += this.speciesColors[i].getRed() * colorFactors[i];
+                G += this.speciesColors[i].getGreen() * colorFactors[i];
+                B += this.speciesColors[i].getBlue() * colorFactors[i];
             }
         }
         
-        colorRedWAvg /= this.nbOfSpecies;
-        colorGreenWAvg /= this.nbOfSpecies;
-        colorBlueWAvg /= this.nbOfSpecies;
+        R = (int) Math.min((R), 255);
+        G = (int) Math.min((G), 255);
+        B = (int) Math.min((B), 255);
         
-        colorRedWAvg = Math.min(colorRedWAvg, 255);
-        colorGreenWAvg = Math.min(colorGreenWAvg, 255);
-        colorBlueWAvg = Math.min(colorBlueWAvg, 255);
-        colorAlpha = Math.min((50 + totalDepositAllSpecies * 10), 255);
+        R = Math.max(R, 0);
+        G = Math.max(G, 0);
+        B = Math.max(B, 0);
         
-        return new Color((int) 255 - colorRedWAvg, (int) 255 - colorGreenWAvg, (int) 255 - colorBlueWAvg, (int) 255);
+        return new Color(R, G, B);
     }
     
 }
