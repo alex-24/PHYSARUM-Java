@@ -35,16 +35,28 @@ This algorithm shows a type of emergent process. Complex global patterns are for
 ## Screenshots
 
 <div align="center">
-    <img src="other_ressources/[300x300].pop-15.dep-15.diffR-1.decay-1.step-1_angles-pi4.soff-29.sr-2.JPG" width="300px">
+    <img src="other_ressources/[300x300].pop-15.dep-15.diffR-1.decay-1.step-1.angles-pi4.soff-29.sr-2.JPG" width="300px">
     &nbsp;&nbsp;&nbsp;
-    <img src="other_ressources/[300x300].pop-20.dep-125.diffR-1.decay-1.step-1_angles-pi.soff-29.sr-0.JPG" width="300px">
+    <img src="other_ressources/[300x300].pop-20.dep-125.diffR-1.decay-1.step-1.angles-pi.soff-29.sr-0.JPG" width="300px">
+</div>
+<div align="center">
+    <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi4.soff-30.sr-1.(example-1).JPG" width="300px">
+    &nbsp;&nbsp;&nbsp;
+    <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi4.soff-30.sr-1.(example-2).JPG" width="300px">
+</div>
+<div align="center">
+    <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi.soff-3.sr-1.(example-1).JPG" width="300px">
+    &nbsp;&nbsp;&nbsp;
+    <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi.soff-3.sr-1.(example-2).JPG" width="300px">
 </div>
 
 
 ### Interesting incorrect results
 
 <div align="center">
-    <img src="other_ressources/[incorrect][300x300].pop-40.dep-25.diffR-1.decay-2.step-4_angles-pi.soff-3.sr-1.JPG" width="300px">
+    <img src="other_ressources/[incorrect-1][300x300].JPG" width="300px">
+    &nbsp;&nbsp;&nbsp;
+    <img src="other_ressources/[incorrect-2][300x300].pop-40.dep-25.diffR-1.decay-2.step-4_angles-pi.soff-3.sr-1.JPG" width="300px">
 </div>
 <br/>
 
