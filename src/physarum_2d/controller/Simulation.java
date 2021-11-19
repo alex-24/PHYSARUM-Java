@@ -49,20 +49,24 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
     
     private Color[][] trailMap;
     Boolean[] isSpeciesActive;
-    private int[] trailsDecayValues;
+    private Double[] decayFactors;
     private int nbOfSpecies;
     
 
-    public Simulation(int width, int height, int populationPercentage, Boolean[] isSpeciesActive, Color[] speciesColor, int[] trailsDecayValues, int diffusionKernel, float wProj) {
+    public Simulation(int width, int height, int populationPercentage, Boolean[] isSpeciesActive, Color[] speciesColor, int[] decayPercentages, int diffusionKernel, float wProj) {
         this.width = width;
         this.height = height;
         this.populationPercentage = populationPercentage;
         this.isSpeciesActive = isSpeciesActive;
-        this.trailsDecayValues = trailsDecayValues;
         this.diffusionKernel = diffusionKernel;
         this.wProj = wProj;
         
         this.trailMap = new Color[this.width][this.height];
+        
+        this.decayFactors = new Double[decayPercentages.length];
+        for (int i = 0; i < decayPercentages.length; i++) {
+            this.decayFactors[i] = (100.0 - decayPercentages[i]) / 100.0;
+        }
         
         for (int i = 0; i < this.width; i++) {
             for (int j = 0; j < this.height; j++) {
@@ -251,8 +255,6 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
         int y = (int) agent.getPosition().getY();
         Color color = this.trailMap[x][y];
         
-        //this.storedDeposits[agent.getSpecies()].add(agent.getPosition());
-        
         switch (agent.getSpecies()) {
             case 0://R
                 int redPlusDep = Math.min(255, color.getRed() + agent.getDepositionT());
@@ -271,34 +273,17 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
     }
 
     private void diffuseAndDecayTrailMap() {
-        
-        // diffuse
         Color[][] trailMap = new Color[this.width][this.height];
         
         for (int i = 0; i < trailMap.length; i++) {
             for (int j = 0; j < trailMap[0].length; j++) {
-                trailMap[i][j] = calcDiffusionAt(i, j);
+                trailMap[i][j] = calcDiffusedAndDecayedTrailValuesFor(i, j);
             }
         }
         this.trailMap = trailMap;
-        
-        Color currentColor;
-        double decayFactor = (100.0 - Constants.SIMU_DECAY_PERCENTAGE_T) / 100.0;
-        
-        // decay
-        for (int i = 0; i < this.width; i++) {
-            for (int j = 0; j < this.height; j++) {
-                currentColor = this.trailMap[i][j];
-                
-                this.trailMap[i][j] = new Color(
-                        Math.max((int)(currentColor.getRed()  * decayFactor), 0),
-                        Math.max((int)(currentColor.getGreen()* decayFactor), 0),
-                        Math.max((int)(currentColor.getBlue() * decayFactor), 0));
-            }
-        }
     }
     
-    private Color calcDiffusionAt(int x, int y) {
+    private Color calcDiffusedAndDecayedTrailValuesFor(int x, int y) {
         
         int iStart = x - this.diffusionKernel;
         int iEnd = x + this.diffusionKernel + 1;
@@ -327,6 +312,10 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
         R /= totalCells;
         G /= totalCells;
         B /= totalCells;
+        
+        R -= this.decayFactors[0];
+        G -= this.decayFactors[1];
+        B -= this.decayFactors[2];
         
         return new Color(R, G, B);
     }
