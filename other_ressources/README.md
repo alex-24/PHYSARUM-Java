@@ -22,19 +22,22 @@
     <img src="[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi4.soff-30.sr-1.(example-1).JPG" width="150px">
     &nbsp;&nbsp;&nbsp;&nbsp;
     <img src="[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi4.soff-30.sr-1.(example-2).JPG" width="150px">
-    &nbsp;&nbsp;&nbsp;&nbsp;
+</div>
+<br/>
+
+<div align="center">
     <img src="[300x300].pop-60.dep-125.diffR-1.decay-2.step-1.angles-pi4.soff-20.sr-0.(example-1).JPG" width="150px">
 </div>
 <br/>
 
 <div align="center">
-    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-1).JPG.JPG" width="150px">
+    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-1).JPG" width="150px">
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-2).JPG.JPG" width="150px">
+    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-2).JPG" width="150px">
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-3).JPG.JPG" width="150px">
+    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-3).JPG" width="150px">
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-4).JPG.JPG" width="150px">
+    <img src="[200x200].pop-75.dep-5.diffR-1.decay-2.step-1.angles-pi.soff-20.sr-1.(example-4).JPG" width="150px">
 </div>
 <br/>
 
