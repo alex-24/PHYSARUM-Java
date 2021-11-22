@@ -17,8 +17,8 @@ public class Constants {
     
     public static final Boolean GUI_DRAW_TRAIL_MAP = true;
     public static final Boolean GUI_DRAW_ALL_AGENTS = false;
-    public static final Boolean GUI_DRAW_SINGLE_AGENT = false;
-    public static final Boolean GUI_DRAW_AGENT_SENSORS = false;
+    public static final Boolean GUI_DRAW_SINGLE_AGENT = true;
+    public static final Boolean GUI_DRAW_AGENT_SENSORS = true;
     
     public static final int AGENT_SIZE = 0;
     public static final int SIMU_UPDATE_INTERVAL_IN_MILLIS = 50;
@@ -26,15 +26,15 @@ public class Constants {
     public static final int SIMU_DECAY_INTERVAL_IN_MILLIS = 1;
     
     public static boolean SIMU_AGENTS_SHOULD_FACE_CENTER = true;
-    public static final Boolean[] SIMU_IS_SPECIES_ACTIVE = new Boolean[] {true, true, false};
-    public static final Color[] SIMU_SPECIES_COLORS = new Color[] {Color.ORANGE, Color.red, Color.cyan};
+    public static final Boolean[] SIMU_IS_SPECIES_ACTIVE = new Boolean[] {true, true, true};
+    public static final Color[] SIMU_SPECIES_COLORS = new Color[] {Color.CYAN, Color.BLACK, Color.BLACK};
     public static final int SIMU_OVERRIDE_POPULATION_SIZE = -10;
     
     
-    public static final int SIMU_WIDTH = 300;
-    public static final int SIMU_HEIGHT = 300;
-    public static final int SIMU_POPULATION_PERCENTAGE = 65;
-    public static final int SIMU_DEP_T = 25;
+    public static final int SIMU_WIDTH = 800;
+    public static final int SIMU_HEIGHT = 800;
+    public static final int SIMU_POPULATION_PERCENTAGE = 75;
+    public static final int SIMU_DEP_T = 125;
     public static final int SIMU_DIFFUSION_RANGE = 1;
     public static final int[] SIMU_DECAY_PERCENTAGE_T = new int[] {2, 2, 2};
     public static final int SIMU_STEP_SIZE = 1;

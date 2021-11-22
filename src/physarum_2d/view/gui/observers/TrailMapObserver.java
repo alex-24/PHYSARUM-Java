@@ -73,7 +73,8 @@ public class TrailMapObserver implements GUIObserver {
         colorFactors[1] = (color.getGreen() > 0)? color.getGreen() / 255.0 : 0;
         colorFactors[2] = (color.getBlue() > 0)? color.getBlue() / 255.0 : 0;
         
-        double totalFactor = Arrays.stream(colorFactors).sum();
+        double alphaFactor = 1 - (Arrays.stream(colorFactors).sum());
+        alphaFactor *= 4;
         
         int R = 0;
         int G = 0;
@@ -87,6 +88,34 @@ public class TrailMapObserver implements GUIObserver {
             }
         }
         
+        int d = 75;
+        R = ((int) (R / d)) * d;
+        G = ((int) (G / d)) * d;
+        B = ((int) (B / d)) * d;
+        
+        
+        //R = (int) Math.abs(Math.sin(R) * R * 2) % this.speciesColors[1].getRed() ;
+        
+        /*R = (int) Math.abs((2 * Math.sin(R) * R));
+        G = (int) Math.abs((2 * Math.sin(G) * G));
+        B = (int) Math.abs((2 * Math.sin(B) * B));*/
+        
+        R = (int) Math.abs((2 * Math.sin(R) * R)) % 255;
+        G = (int) Math.abs((2 * Math.sin(G) * G)) % 255;
+        B = (int) Math.abs((2 * Math.sin(B) * B)) % 255;
+        
+        /*R = (int) Math.abs((2 * Math.cos(R) * R));
+        G = (int) Math.abs((2 * Math.cos(G) * G));
+        B = (int) Math.abs((2 * Math.cos(B) * B));*/
+        
+        /*R = (int) Math.abs((2 * Math.cos(R) * R)) % 255;
+        G = (int) Math.abs((2 * Math.cos(G) * G)) % 255;
+        B = (int) Math.abs((2 * Math.cos(B) * B)) % 255;*/
+        
+        /*R = (int) (-2 * Math.tan(R) * R) % 255;
+        G = (int) (-2 * Math.tan(G) * G) % 255;
+        B = (int) (-2 * Math.tan(B) * B) % 255;*/
+        
         R = (int) Math.min((R), 255);
         G = (int) Math.min((G), 255);
         B = (int) Math.min((B), 255);
@@ -94,6 +123,8 @@ public class TrailMapObserver implements GUIObserver {
         R = Math.max(R, 0);
         G = Math.max(G, 0);
         B = Math.max(B, 0);
+        
+        int A = Math.max(0, Math.min((int) ((R + G + B) * alphaFactor), 255));
         
         return new Color(R, G, B);
     }

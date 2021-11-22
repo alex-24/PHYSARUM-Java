@@ -209,7 +209,12 @@ public class Simulation extends Thread implements SimuUpdateEventSender, GUIUpda
             }
         }
         
-        return ownSpecies - foreignSpecies;
+        //return ownSpecies - foreignSpecies;
+        //return ownSpecies;
+        //return foreignSpecies - ownSpecies;
+        //return foreignSpecies;
+        return -foreignSpecies;
+
     }
     
     private void executeSensoryStage(Agent agent) {

@@ -27,7 +27,7 @@ public class Species {
         this.agents = new ArrayList<>();
         this.decayT = decayT;
         
-        Vector position = Vector.randomVector(0, simulation.getWidth(), 0, simulation.getHeight());
+        Vector position;
         Vector direction;
         
         populationSize = (Constants.SIMU_OVERRIDE_POPULATION_SIZE > - 1)? Constants.SIMU_OVERRIDE_POPULATION_SIZE : populationSize;
