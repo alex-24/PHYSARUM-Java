@@ -39,8 +39,6 @@ This algorithm shows a type of emergent process : A complex global pattern is fo
 <!-- SCREENSHOT -->
 ## Screenshots
 
-<p><i>(<a href="https://github.com/alex-24/PHYSARUM-Java/tree/master/other_ressources">More screenshots!</a>)</i></p>
-
 * <p><b>One species :</b></p>
 <div align="center">
     <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi.soff-3.sr-1.(example-1).JPG" width="150px">
@@ -67,6 +65,9 @@ This algorithm shows a type of emergent process : A complex global pattern is fo
     &nbsp;&nbsp;&nbsp;&nbsp;
     <img src="other_ressources/[300x300].pop-60.dep-25.diffR-1.decay-2.step-4.angles-pi4.soff-30.sr-1.(example-2).JPG" width="150px">
 </div>
+<br/>
+
+<p><a href="https://github.com/alex-24/PHYSARUM-Java/tree/master/other_ressources">(More screenshots)</a></p>
 <br/>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
